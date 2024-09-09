@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.io Example</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <input type="text" id="inputBox" placeholder="Type something..." />
+    <script>
+        const socket = io();
+        const inputBox = document.getElementById('inputBox');
+        let typingTimer;
+        const typingTimeout = 2000; // Time in milliseconds (3 seconds)
+
+        // Function to send the message to the server
+        function sendMessage() {
+            const message = inputBox.value;
+            if (message.trim() !== "") {
+                socket.emit('userStoppedTyping', message);
+                console.log(`Message sent: ${message}`);
+            }
+        }
+
+        // Listen for input events
+        inputBox.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(sendMessage, typingTimeout);
+        });
+
+        // Clear the timer if the user types again before the timeout
+        inputBox.addEventListener('keydown', () => {
+            clearTimeout(typingTimer);
+        });
+
+        // Handle WebSocket connection open
+        socket.on('connect', () => {
+            console.log('Connected to the server');
+        });
+
+        // Handle WebSocket disconnection
+        socket.on('disconnect', () => {
+            console.log('Disconnected from the server');
+        });
+    </script>
+</body>
+</html>
